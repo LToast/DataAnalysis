@@ -10,9 +10,9 @@ import pandas as pd
 
 #récupération de toutes les données
 tracks_spotify =  pd.read_csv('track_details_spot.csv')
-dataset = pd.read_csv('data.csv')
+dataset = pd.read_csv('dataLight.csv')
 #selection de la region
-dfr = dataset[dataset.Region=="us"]
+dfr = dataset[dataset.Region=="fr"]
 dfr=dfr.drop(["Region"],axis=1)
 #échantillon des données pour 2017 (365 jours)
 dfr=dfr [(dataset.Date < '2018-01-01')]
