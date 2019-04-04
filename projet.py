@@ -28,6 +28,7 @@ agg_title=aggregation.join(dfr_unique.reset_index().set_index("Track Name"))
 agg_title["id"]=agg_title["URL"].str.split("/").str[4]
 full = agg_title.merge(scrap, on="id").select_dtypes([np.number])
 full["Score"] = full.Date / full.Position
+
 full = full.drop(["Unnamed: 0", "Position", "Date"], axis=1)
 
 
@@ -42,3 +43,5 @@ desc = full.describe()
 #jointure ave le fichier d'analyse des chansons
 join = agg_title.reset_index().set_index("id").join(tracks_spotify.set_index("id")).dropna()
 df=join.drop(["URL","Unnamed: 0","analysis_url","deezer_id","track_href","type","uri"],axis=1)
+#export du dataframe final
+df.to_csv("dataframe.csv",sep=",", encoding='iso-8859-1')
