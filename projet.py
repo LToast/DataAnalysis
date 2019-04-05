@@ -28,22 +28,9 @@ agg_title=aggregation.join(dfr_unique.reset_index().set_index("Track Name"))
 #on extrait le track id de l'url pour la jointure
 agg_title["id"]=agg_title["URL"].str.split("/").str[4]
 
-full = agg_title.merge(scrap, on="id").select_dtypes([np.number])
+full = agg_title.merge(scrap, on="id")
 full["Score"] = full.Date / full.Position
 
 full = full.drop(["Unnamed: 0", "Position", "Date"], axis=1)
 
-
-full.plot(kind="scatter", x="Score", y="Streams")
-full  = full[full["Score"]<10]
-full.Score.plot(kind="hist")
-
-Score = full.Score.values
-plt.hist((Score - np.mean(Score)) / np.std(Score), bins=400);
-
-desc = full.describe()
-#jointure ave le fichier d'analyse des chansons
-join = agg_title.reset_index().set_index("id").join(scrap.set_index("id")).dropna()
-df=join.drop(["URL","Unnamed: 0","analysis_url","track_href","type","uri","index"],axis=1)
-#export du dataframe final
-df.to_csv("dataframe.csv",sep=",", encoding='utf-8')
+full.to_csv("dataframe.csv",sep=",", encoding='utf-8')
