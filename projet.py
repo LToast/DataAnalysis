@@ -8,7 +8,6 @@ from sklearn.decomposition import pca
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-import scrap as sc
 
 #récupération de toutes les données
 scrap = pd.read_csv("scrap.csv")
@@ -22,15 +21,16 @@ dfr=dfr [(dataset.Date < '2018-01-01')]
 #on a pour chaque chanson une ligne par jour dans le classement top200
 #pour chaque chanson, on récupère la somme des stream, la position médiane et le nombre de jour
 #où cette chanson était dans le classement
-aggregation = dfr.groupby(['Track Name']).agg({'Streams' : np.sum,'Position' : np.mean,'Date':np.size})
-dfr_unique=dfr.get(['Artist','Track Name','URL']).drop_duplicates(subset=['Track Name'])
-agg_title=aggregation.join(dfr_unique.reset_index().set_index("Track Name"))
+aggregation = dfr.groupby(['URL']).agg({'Streams' : np.sum,'Position' : np.mean,'Date':np.size})
+dfr_unique=dfr.get(['Artist','Track Name','URL']).drop_duplicates(subset=['URL'])
+agg_title=aggregation.merge(dfr_unique,on="URL")
 #on extrait le track id de l'url pour la jointure
 agg_title["id"]=agg_title["URL"].str.split("/").str[4]
 
 full = agg_title.merge(scrap, on="id")
 full["Score"] = full.Date / full.Position
+#transformation de duration_ms en duration
+full['duration']=round(full['duration_ms']/1000,0)
 
-full = full.drop(["Unnamed: 0", "Position", "Date"], axis=1)
-
+full = full.drop(["Unnamed: 0", "Position", "Date","duration_ms","URL","id","analysis_url","track_href","type","uri"], axis=1)
 full.to_csv("dataframe.csv",sep=",", encoding='utf-8')
